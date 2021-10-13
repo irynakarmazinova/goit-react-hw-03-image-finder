@@ -33,6 +33,8 @@ class App extends Component {
   }
 }
 
+//PureComponent и shouldComponentUpdate
+
 export default App;
 
 // --------------------

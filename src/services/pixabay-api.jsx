@@ -8,9 +8,7 @@ function fetchImages(searchImageName, page) {
       return response.json();
     }
 
-    return Promise.reject(
-      new Error(`There is no picture with ${searchImageName} name`),
-    );
+    return response;
   });
 }
 

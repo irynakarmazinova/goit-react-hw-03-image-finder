@@ -56,12 +56,17 @@ class ImageGallery extends Component {
     this.setState({ status: Status.PENDING, lastPage: page });
 
     fetchImages(searchImageName, page)
-      .then(({ hits }) =>
-        this.setState({
-          images: [...(images || []), ...hits],
-          status: Status.RESOLVED,
-        }),
-      )
+      .then(({ hits, total }) => {
+        if (!total) {
+          const error = new Error(`This ${searchImageName} not found.`);
+          this.setState({ error, status: Status.REJECTED });
+        } else {
+          this.setState({
+            images: [...(images || []), ...hits],
+            status: Status.RESOLVED,
+          });
+        }
+      })
       .catch(error => this.setState({ error, status: Status.REJECTED }));
   };
 

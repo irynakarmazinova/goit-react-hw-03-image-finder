@@ -58,7 +58,9 @@ class ImageGallery extends Component {
     fetchImages(searchImageName, page)
       .then(({ hits, total }) => {
         if (!total) {
-          const error = new Error(`This ${searchImageName} not found.`);
+          const error = new Error(
+            `There is no picture with ${searchImageName} name, please enter another request`,
+          );
           this.setState({ error, status: Status.REJECTED });
         } else {
           this.setState({

@@ -26,10 +26,9 @@ class Modal extends Component {
     const {
       activeImg: { largeImageURL, tags },
     } = this.props;
-    const { handleBackdropClick } = this;
 
     return (
-      <div className="Overlay" onClick={handleBackdropClick}>
+      <div className="Overlay" onClick={this.handleBackdropClick}>
         <div className="Modal">
           <img src={largeImageURL} alt={tags} />
         </div>
@@ -37,6 +36,7 @@ class Modal extends Component {
     );
   }
 }
+export default Modal;
 
 Modal.propTypes = {
   onModalClose: PropTypes.func.isRequired,
@@ -45,5 +45,3 @@ Modal.propTypes = {
     tags: PropTypes.string.isRequired,
   }).isRequired,
 };
-
-export default Modal;

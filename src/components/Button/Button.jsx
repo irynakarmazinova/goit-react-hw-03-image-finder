@@ -5,9 +5,8 @@ const Button = ({ onBtnClick }) => (
     Load more...
   </button>
 );
+export default Button;
 
 Button.propTypes = {
   onBtnClick: PropTypes.func.isRequired,
 };
-
-export default Button;

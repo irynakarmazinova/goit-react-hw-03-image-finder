@@ -9,11 +9,12 @@ const ImageGalleryItem = ({
     <img src={webformatURL} alt={tags} className="ImageGalleryItem-image" />
   </li>
 );
+export default ImageGalleryItem;
 
 ImageGalleryItem.propTypes = {
+  image: PropTypes.shape({
+    webformatURL: PropTypes.string,
+    tags: PropTypes.string,
+  }).isRequired,
   onModalOpen: PropTypes.func.isRequired,
-  webformatURL: PropTypes.string,
-  tags: PropTypes.string,
 };
-
-export default ImageGalleryItem;

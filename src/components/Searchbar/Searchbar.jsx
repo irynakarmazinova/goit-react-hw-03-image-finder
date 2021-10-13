@@ -30,12 +30,11 @@ class Searchbar extends Component {
 
   render() {
     const { searchImageName } = this.state;
-    const { handleImageChange, handleSubmit } = this;
 
     return (
       <header className="Searchbar">
         {/* onSubmit - регистрация на событии сабмита на встроенном компоненте form */}
-        <form className="SearchForm" onSubmit={handleSubmit}>
+        <form className="SearchForm" onSubmit={this.handleSubmit}>
           <button type="submit" className="SearchForm-button">
             <span className="SearchForm-button-label">Search</span>
           </button>
@@ -47,16 +46,15 @@ class Searchbar extends Component {
             autoFocus
             placeholder="Search images and photos"
             value={searchImageName}
-            onChange={handleImageChange}
+            onChange={this.handleImageChange}
           />
         </form>
       </header>
     );
   }
 }
+export default Searchbar;
 
 Searchbar.propTypes = {
   submit: PropTypes.func.isRequired,
 };
-
-export default Searchbar;

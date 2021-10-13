@@ -1,9 +1,12 @@
 import React, { Component } from 'react';
+import PropTypes from 'prop-types';
 
-import ImageGalleryItem from '../ImageGalleryItem/ImageGalleryItem';
+import fetchImages from 'services/pixabay-api';
+
+import ImageGalleryItem from './ImageGalleryItem/ImageGalleryItem';
+import Button from '../Button/Button';
 import Loader from '../Loader/Loader';
-
-const API_KEY = '22935349-f238c1b9d1a1a29229f76f105';
+import Modal from '../Modal/Modal';
 
 const Status = {
   IDLE: 'idle', //  простой, стоит и ничего не делает
@@ -14,12 +17,14 @@ const Status = {
 
 class ImageGallery extends Component {
   state = {
-    image: null,
+    images: [],
     error: null,
-    status: 'idle',
-  };
+    status: Status.IDLE,
+    showModal: false,
 
-  // componentDidMount() {для фетча}
+    activeImg: null,
+    lastPage: 1,
+  };
 
   // когда компонент обновляется
   componentDidUpdate(prevProps, prevState) {
@@ -29,52 +34,98 @@ class ImageGallery extends Component {
     // предыдущий пропс имг и следующий(текущий) пропс имг
     // старый рендет-новый рендер
     if (prevProps.searchImageName !== searchImageName) {
-      this.setState({ status: 'pending' });
+      this.setState({ images: [] }, () => {
+        this.loadImages(1);
+      });
+    }
 
-      fetch(
-        `https://pixabay.com/api/?q=${searchImageName}&page=1&key=${API_KEY}&image_type=photo&orientation=horizontal&per_page=12`,
-      )
-        .then(response => {
-          if (response.ok) {
-            return response.json();
-          }
-
-          return Promise.reject(
-            new Error(`There is no picture with ${searchImageName} name`),
-          );
-        })
-        .then(image => this.setState({ image, status: 'resolved' }))
-        .catch(error => this.setState({ error, status: 'rejected' }));
+    if (prevState.images !== this.state.images) {
+      setTimeout(() => {
+        window.scrollTo({
+          top: document.documentElement.scrollHeight,
+          behavior: 'smooth',
+        });
+      }, 0);
     }
   }
 
-  render() {
-    const { image, error, status } = this.state;
+  loadImages = page => {
+    const { images } = this.state;
+    const { searchImageName } = this.props;
 
-    if (status === 'idle') {
+    this.setState({ status: Status.PENDING, lastPage: page });
+
+    fetchImages(searchImageName, page)
+      .then(({ hits }) =>
+        this.setState({
+          images: [...(images || []), ...hits],
+          status: Status.RESOLVED,
+        }),
+      )
+      .catch(error => this.setState({ error, status: Status.REJECTED }));
+  };
+
+  toggleModal = () => {
+    this.setState(({ showModal }) => ({ showModal: !showModal }));
+  };
+
+  onModalOpen = activeImg => {
+    this.setState({ activeImg });
+    this.toggleModal();
+  };
+
+  onBtnClick = () => {
+    const { lastPage } = this.state;
+
+    this.loadImages(lastPage + 1);
+  };
+
+  render() {
+    const { images, error, status, showModal, activeImg } = this.state;
+    const { toggleModal, onBtnClick, onModalOpen } = this;
+
+    if (status === Status.IDLE) {
       return <div className="errorMessage">Please enter your request</div>;
     }
 
-    if (status === 'pending') {
-      return <div>Loading...</div>;
-      // return <Loader />;
+    if (status === Status.PENDING) {
+      return <Loader />;
     }
 
-    if (status === 'rejected') {
+    if (status === Status.REJECTED) {
       return <h1>{error.message}</h1>;
     }
 
-    if (status === 'resolved') {
+    if (status === Status.RESOLVED) {
       return (
-        <ul className="ImageGallery">
-          <ImageGalleryItem image={image} />
-          {/* {image.map((img => ({
-            <ImageGalleryItem key={ image.id} (...image) />
-          })))} */}
-        </ul>
+        <>
+          <ul className="ImageGallery">
+            {images.map(image => (
+              <ImageGalleryItem
+                key={`image-item-image-${image.id}`}
+                onModalOpen={onModalOpen}
+                // webformatURL={image.webformatURL}
+                // tags={image.tags}
+                // largeImageURL={image.largeImageURL}
+                // {...image}
+                image={image}
+              />
+            ))}
+          </ul>
+
+          <Button onBtnClick={onBtnClick} />
+
+          {showModal && (
+            <Modal onModalClose={toggleModal} activeImg={activeImg} />
+          )}
+        </>
       );
     }
   }
 }
+
+ImageGallery.propTypes = {
+  searchImageName: PropTypes.string.isRequired,
+};
 
 export default ImageGallery;

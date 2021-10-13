@@ -221,3 +221,8 @@ img {
   font: inherit;
   font-size: 20px;
 }
+
+.modalImg {
+  max-height: 90vh;
+  max-width: 90vw;
+}

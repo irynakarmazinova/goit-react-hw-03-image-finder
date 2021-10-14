@@ -92,8 +92,7 @@ class ImageGallery extends Component {
   };
 
   render() {
-    const { images, error, status, showModal, activeImg } = this.state;
-    const { toggleModal, onBtnClick, onModalOpen } = this;
+    const { images, error, status, showModal, loading, activeImg } = this.state;
 
     if (status === Status.IDLE) {
       return <div className="errorMessage">Please enter your request</div>;
@@ -114,7 +113,7 @@ class ImageGallery extends Component {
             {images.map(image => (
               <ImageGalleryItem
                 key={`image-item-image-${image.id}`}
-                onModalOpen={onModalOpen}
+                onModalOpen={this.onModalOpen}
                 // webformatURL={image.webformatURL}
                 // tags={image.tags}
                 // largeImageURL={image.largeImageURL}
@@ -124,11 +123,11 @@ class ImageGallery extends Component {
             ))}
           </ul>
 
-          {this.state.loading && <Loader />}
-          <Button onBtnClick={onBtnClick} />
+          {loading && <Loader />}
+          <Button onBtnClick={this.onBtnClick} />
 
           {showModal && (
-            <Modal onModalClose={toggleModal} activeImg={activeImg} />
+            <Modal onModalClose={this.toggleModal} activeImg={activeImg} />
           )}
         </>
       );

@@ -18,15 +18,13 @@ class App extends Component {
 
   render() {
     const { searchImageName } = this.state;
-    const { handleFormSubmit } = this;
 
     return (
       <div className="App">
         <ToastContainer />
 
         {/* в Searchbar передаю проп submit(имя пропса), куда я передаю ссылку на метод handleFormSubmit */}
-        <Searchbar submit={handleFormSubmit} />
-
+        <Searchbar submit={this.handleFormSubmit} />
         <ImageGallery searchImageName={searchImageName} />
       </div>
     );

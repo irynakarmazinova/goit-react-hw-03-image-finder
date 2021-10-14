@@ -21,6 +21,7 @@ class ImageGallery extends Component {
     error: null,
     status: Status.IDLE,
     showModal: false,
+    loading: false,
 
     activeImg: null,
     lastPage: 1,
@@ -53,23 +54,26 @@ class ImageGallery extends Component {
     const { images } = this.state;
     const { searchImageName } = this.props;
 
-    this.setState({ status: Status.PENDING, lastPage: page });
+    this.setState({ loading: true, lastPage: page });
+    setTimeout(() => {
+      fetchImages(searchImageName, page)
+        .then(({ hits, total }) => {
+          if (!total) {
+            const error = new Error(
+              `There is no picture with ${searchImageName} name, please enter another request`,
+            );
+            this.setState({ error, status: Status.REJECTED });
+          } else {
+            this.setState({
+              images: [...(images || []), ...hits],
+              status: Status.RESOLVED,
+            });
+          }
+        })
+        .catch(error => this.setState({ error, status: Status.REJECTED }));
 
-    fetchImages(searchImageName, page)
-      .then(({ hits, total }) => {
-        if (!total) {
-          const error = new Error(
-            `There is no picture with ${searchImageName} name, please enter another request`,
-          );
-          this.setState({ error, status: Status.REJECTED });
-        } else {
-          this.setState({
-            images: [...(images || []), ...hits],
-            status: Status.RESOLVED,
-          });
-        }
-      })
-      .catch(error => this.setState({ error, status: Status.REJECTED }));
+      this.setState({ loading: false });
+    }, 1000);
   };
 
   toggleModal = () => {
@@ -83,7 +87,7 @@ class ImageGallery extends Component {
 
   onBtnClick = () => {
     const { lastPage } = this.state;
-
+    this.setState({ loading: true });
     this.loadImages(lastPage + 1);
   };
 
@@ -95,9 +99,9 @@ class ImageGallery extends Component {
       return <div className="errorMessage">Please enter your request</div>;
     }
 
-    if (status === Status.PENDING) {
-      return <Loader />;
-    }
+    // if (status === Status.PENDING) {
+    //   return <Loader />;
+    // }
 
     if (status === Status.REJECTED) {
       return <h1>{error.message}</h1>;
@@ -120,6 +124,7 @@ class ImageGallery extends Component {
             ))}
           </ul>
 
+          {this.state.loading && <Loader />}
           <Button onBtnClick={onBtnClick} />
 
           {showModal && (
